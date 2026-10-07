@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="nl" class="h-full bg-slate-100">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connect | UMC Utrecht Intranet</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        umc: {
+                            pink: '#D81B60',
+                            pinkhover: '#C2185B',
+                            pinklight: '#FCE4EC',
+                            pinkaccent: '#F48FB1',
+                            navy: '#0F172A',
+                            slate: '#F1F5F9',
+                            silver: '#E2E8F0',
+                            border: '#CBD5E1'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
+        ::-webkit-scrollbar-thumb:hover { background: #D81B60; }
+
+        .umc-gradient {
+            background: linear-gradient(135deg, #D81B60 0%, #AD1457 100%);
+        }
+
+        .tab-active {
+            color: #D81B60;
+            border-bottom: 3px solid #D81B60;
+            font-weight: 700;
+        }
+
+        .card-hover {
+            transition: all 0.2s ease-in-out;
+        }
+        .card-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(216, 27, 96, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.03);
+        }
+    </style>
+</head>
+<body class="h-full font-sans text-slate-800 bg-slate-100 flex flex-col antialiased selection:bg-umc-pinklight selection:text-umc-pink">
+
+    <!-- Top Header Navigation Bar -->
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-xs">
+        <!-- Top Bar with Branding & Search -->
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between gap-4">
+            <!-- Brand Logo & Name -->
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl umc-gradient flex items-center justify-center text-white shadow-md shadow-pink-900/20 shrink-0">
+                    <i data-lucide="cross" class="w-6 h-6 stroke-[2.5]"></i>
+                </div>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <span class="font-extrabold text-slate-900 text-xl tracking-tight">CONNECT</span>
+                        <span class="bg-umc-pinklight text-umc-pink font-bold text-[10px] px-2 py-0.5 rounded-full uppercase">UMC Utrecht</span>
+                    </div>
+                    <p class="text-[11px] text-slate-500 font-medium hidden sm:block">Het intranet voor en door medewerkers van UMC Utrecht</p>
+                </div>
+            </div>
+
+            <!-- Global Search Bar -->
+            <div class="flex-1 max-w-xl relative">
+                <div class="relative">
+                    <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+                    <input type="text" id="globalSearchInput" oninput="handleGlobalSearch(this.value)" placeholder="Zoek in nieuws, telefoongids, protocollen (bijv. Zenya, HiX, SEH)..." class="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-umc-pink focus:bg-white transition-all shadow-inner">
+                </div>
+                <!-- Search Quick Results Box -->
+                <div id="searchResultsDropdown" class="hidden absolute left-0 right-0 top-12 bg-white border border-slate-200 rounded-xl shadow-xl z-50 overflow-hidden text-xs max-h-80 overflow-y-auto">
+                    <!-- Populated via JS -->
+                </div>
+            </div>
+
+            <!-- Header Actions & Profile -->
+            <div class="flex items-center gap-2">
+                <!-- Notifications Dropdown Trigger -->
+                <button onclick="toggleNotifications()" class="relative p-2 rounded-xl text-slate-600 hover:bg-slate-100 transition-all">
+                    <i data-lucide="bell" class="w-5 h-5"></i>
+                    <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-umc-pink rounded-full ring-2 ring-white"></span>
+                </button>
+
+                <!-- Language / Context -->
+                <div class="hidden md:flex items-center gap-1 text-[11px] font-bold text-slate-500 bg-slate-100 px-2.5 py-1.5 rounded-lg border border-slate-200">
+                    <span class="text-umc-pink">NL</span>
+                    <span>/</span>
+                    <span class="text-slate-400 cursor-pointer hover:text-slate-600">EN</span>
+                </div>
+
+                <!-- User Profile -->
+                <div class="flex items-center gap-2.5 pl-2 border-l border-slate-200">
+                    <div class="w-8 h-8 rounded-full bg-slate-200 border border-slate-300 overflow-hidden flex items-center justify-center font-bold text-xs text-umc-pink">
+                        <img src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&q=80&w=150" alt="Avatar" class="w-full h-full object-cover" onerror="this.remove()">
+                        <span>DR</span>
+                    </div>
+                    <div class="hidden lg:block text-left">
+                        <div class="font-bold text-xs text-slate-900 leading-tight">Dr. Anouk de Jong</div>
+                        <div class="text-[10px] text-slate-500">Verpleegkundig Specialist • Interne Geneeskunde</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation Tabs Bar -->
+        <nav class="bg-slate-900 text-white px-4 sm:px-6 lg:px-8">
+            <div class="max-w-7xl mx-auto flex items-center space-x-1 overflow-x-auto text-xs font-semibold">
+                <button onclick="switchTab('home')" id="tab-home" class="tab-btn tab-active px-4 py-3 flex items-center gap-2 whitespace-nowrap transition-all border-b-2">
+                    <i data-lucide="home" class="w-4 h-4"></i>
+                    <span>Home & Nieuws</span>
+                </button>
+                <button onclick="switchTab('directory')" id="tab-directory" class="tab-btn px-4 py-3 flex items-center gap-2 text-slate-300 hover:text-white whitespace-nowrap transition-all border-b-2 border-transparent">
+                    <i data-lucide="book-user" class="w-4 h-4"></i>
+                    <span>Gids & Telefoongids</span>
+                </button>
+                <button onclick="switchTab('protocols')" id="tab-protocols" class="tab-btn px-4 py-3 flex items-center gap-2 text-slate-300 hover:text-white whitespace-nowrap transition-all border-b-2 border-transparent">
+                    <i data-lucide="file-check" class="w-4 h-4"></i>
+                    <span>Protocollen & Kwaliteit</span>
+                </button>
+                <button onclick="switchTab('uit')" id="tab-uit" class="tab-btn px-4 py-3 flex items-center gap-2 text-slate-300 hover:text-white whitespace-nowrap transition-all border-b-2 border-transparent">
+                    <i data-lucide="heart-handshake" class="w-4 h-4 text-umc-pinkaccent"></i>
+                    <span class="text-white font-bold bg-umc-pink px-2 py-0.5 rounded-md">UMC! UIT Voordelen</span>
+                </button>
+                <button onclick="switchTab('hr')" id="tab-hr" class="tab-btn px-4 py-3 flex items-center gap-2 text-slate-300 hover:text-white whitespace-nowrap transition-all border-b-2 border-transparent">
+                    <i data-lucide="credit-card" class="w-4 h-4"></i>
+                    <span>Mijn HR & Salaris</span>
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Notifications Drawer Modal -->
+    <div id="notificationsDrawer" class="hidden fixed top-16 right-4 sm:right-12 w-80 sm:w-96 bg-white border border-slate-200 rounded-2xl shadow-2xl z-50 p-4 space-y-3">
+        <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+            <h3 class="font-bold text-xs uppercase tracking-wider text-slate-900 flex items-center gap-2">
+                <i data-lucide="bell" class="w-4 h-4 text-umc-pink"></i>
+                Meldingen & Updates
+            </h3>
+            <button onclick="toggleNotifications()" class="text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-4 h-4"></i></button>
+        </div>
+
+        <div class="space-y-2 text-xs">
+            <div class="p-2.5 bg-umc-pinklight/40 border border-umc-pinklight rounded-xl space-y-1">
+                <div class="flex justify-between font-bold text-umc-pink text-[11px]">
+                    <span>Systeemupdate HiX 6.3</span>
+                    <span class="text-slate-400 font-normal">Zondag 02:00</span>
+                </div>
+                <p class="text-slate-700">Gepland onderhoud van het EPD. Klik voor werkinstructies tijdens uitval.</p>
+            </div>
+
+            <div class="p-2.5 bg-slate-50 border border-slate-200 rounded-xl space-y-1">
+                <div class="flex justify-between font-bold text-slate-800 text-[11px]">
+                    <span>UMC! UIT Zomerconcert</span>
+                    <span class="text-slate-400 font-normal">Gisteren</span>
+                </div>
+                <p class="text-slate-600">Gratis kaarten voor TivoliVredenburg zijn nu beschikbaar voor medewerkers.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN CONTENT AREA -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-1 w-full">
+
+        <!-- VIEW 1: HOME & NEWS -->
+        <div id="view-home" class="space-y-6">
+            
+            <!-- Quick Alert Banner -->
+            <div class="bg-amber-50 border border-amber-200 rounded-2xl p-4 flex items-center justify-between gap-3 text-xs shadow-xs">
+                <div class="flex items-center gap-3">
+                    <div class="p-2 bg-amber-500 text-white rounded-xl font-bold shrink-0">
+                        <i data-lucide="shield-alert" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <span class="font-extrabold text-amber-900 uppercase tracking-wide">Belangrijk Hygiëneprotocol:</span>
+                        <span class="text-amber-800 font-medium">Extra waakzaamheid inzake Norovirus op afdeling D4-Oost. Raadpleeg het Zenya protocol voor isolatiemaatregelen.</span>
+                    </div>
+                </div>
+                <button onclick="switchTab('protocols')" class="px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white font-bold rounded-lg text-[11px] whitespace-nowrap transition-all">Bekijk Protocol</button>
+            </div>
+
+            <!-- Top Grid: News & Quick Software Bar -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+                <!-- Left 2 Cols: Main News Carousel & Feed -->
+                <div class="lg:col-span-2 space-y-6">
+                    
+                    <!-- Featured News Spotlight -->
+                    <div class="relative bg-slate-900 rounded-3xl overflow-hidden shadow-md text-white group">
+                        <img src="https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&q=80&w=1000" alt="UMC Utrecht" class="w-full h-80 object-cover opacity-45 group-hover:scale-105 transition-all duration-500">
+                        <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent p-6 sm:p-8 flex flex-col justify-end">
+                            <div class="flex items-center gap-2 mb-2">
+                                <span class="bg-umc-pink text-white font-extrabold text-[10px] px-2.5 py-1 rounded-full uppercase tracking-wider">Innovatie & Zorg</span>
+                                <span class="text-slate-300 text-xs font-medium">7 Oktober 2026</span>
+                            </div>
+                            <h2 class="text-xl sm:text-2xl font-extrabold leading-tight text-white mb-2">
+                                UMC Utrecht opent geavanceerd Robotic Surgery Center in Centrum voor Oncologie
+                            </h2>
+                            <p class="text-slate-300 text-xs sm:text-sm line-clamp-2 font-normal mb-4">
+                                Met de ingebruikname van drie nieuwe chirurgische robots zet ons ziekenhuis een grote stap in patiëntvriendelijke en precisie-operaties. Lees het interview met dr. S. van Veen.
+                            </p>
+                            <div class="flex items-center gap-3">
+                                <button onclick="openArticleModal(1)" class="bg-umc-pink hover:bg-umc-pinkhover text-white font-bold text-xs px-4 py-2 rounded-xl transition-all flex items-center gap-2">
+                                    <span>Lees Volledig Artikel</span>
+                                    <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                                </button>
+                                <span class="text-slate-400 text-xs flex items-center gap-1"><i data-lucide="message-square" class="w-3.5 h-3.5"></i> 14 reacties</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Secondary News Cards Grid -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        
+                        <!-- News Card 1 -->
+                        <div class="bg-white border border-slate-200 rounded-2xl p-4 card-hover space-y-3 flex flex-col justify-between">
+                            <div class="space-y-2">
+                                <div class="flex items-center justify-between text-[11px]">
+                                    <span class="text-umc-pink font-bold uppercase">Medewerkers in Beeld</span>
+                                    <span class="text-slate-400">Gisteren</span>
+                                </div>
+                                <h3 class="font-bold text-slate-900 text-sm leading-snug hover:text-umc-pink cursor-pointer" onclick="openArticleModal(2)">
+                                    Dag van de Verpleegkunde 2026: Zó vieren we onze helden op de vloer
+                                </h3>
+                                <p class="text-slate-600 text-xs leading-relaxed line-clamp-2">
+                                    Bekijk het overzicht van feestelijke activiteiten, traktaties op de afdelingen en de uitreiking van de UMC Utrecht Zorgvernieuwing Award.
+                                </p>
+                            </div>
+                            <div class="flex items-center justify-between pt-2 border-t border-slate-100 text-[11px] text-slate-500">
+                                <span>Redactie Connect</span>
+                                <span class="font-semibold text-umc-pink cursor-pointer" onclick="openArticleModal(2)">Lees meer →</span>
+                            </div>
+                        </div>
+
+                        <!-- News Card 2 -->
+                        <div class="bg-white border border-slate-200 rounded-2xl p-4 card-hover space-y-3 flex flex-col justify-between">
+                            <div class="space-y-2">
+                                <div class="flex items-center justify-between text-[11px]">
+                                    <span class="text-purple-600 font-bold uppercase">Duurzaamheid</span>
+                                    <span class="text-slate-400">4 Okt 2026</span>
+                                </div>
+                                <h3 class="font-bold text-slate-900 text-sm leading-snug hover:text-umc-pink cursor-pointer" onclick="openArticleModal(3)">
+                                    Green Teams reduceren medisch afval op de OK met 25%
+                                </h3>
+                                <p class="text-slate-600 text-xs leading-relaxed line-clamp-2">
+                                    Dankzij slimme recycling en herbruikbare afdekmaterialen boekt ons ziekenhuis indrukwekkende resultaten richting een klimaatneutraal UMC.
+                                </p>
+                            </div>
+                            <div class="flex items-center justify-between pt-2 border-t border-slate-100 text-[11px] text-slate-500">
+                                <span>Duurzaam UMC</span>
+                                <span class="font-semibold text-umc-pink cursor-pointer" onclick="openArticleModal(3)">Lees meer →</span>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Right 1 Col: Quick Links, Roster Widget & Events -->
+                <div class="space-y-6">
+
+                    <!-- Direct Portal Access Applications (Zenya, HiX, Digitaal Leerplein) -->
+                    <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs space-y-3">
+                        <h3 class="font-extrabold text-xs text-slate-900 uppercase tracking-wider flex items-center justify-between border-b border-slate-100 pb-2">
+                            <span class="flex items-center gap-2">
+                                <i data-lucide="layout-grid" class="w-4 h-4 text-umc-pink"></i>
+                                Direct naar Applicaties
+                            </span>
+                            <i data-lucide="external-link" class="w-3.5 h-3.5 text-slate-400"></i>
+                        </h3>
+
+                        <div class="grid grid-cols-2 gap-2 text-xs">
+                            <a href="#" onclick="alert('Opening ChipSoft HiX EPD Portal...')" class="p-3 bg-slate-50 hover:bg-umc-pinklight/40 border border-slate-200 hover:border-umc-pinkaccent rounded-xl font-bold text-slate-800 hover:text-umc-pink transition-all flex flex-col items-center text-center gap-1.5 group">
+                                <div class="w-8 h-8 rounded-lg bg-blue-600 text-white flex items-center justify-center font-black text-xs shadow-xs group-hover:scale-105 transition-transform">HiX</div>
+                                <span>HiX EPD</span>
+                            </a>
+
+                            <a href="#" onclick="alert('Opening Zenya Quality & Protocols Portal...')" class="p-3 bg-slate-50 hover:bg-umc-pinklight/40 border border-slate-200 hover:border-umc-pinkaccent rounded-xl font-bold text-slate-800 hover:text-umc-pink transition-all flex flex-col items-center text-center gap-1.5 group">
+                                <div class="w-8 h-8 rounded-lg bg-emerald-600 text-white flex items-center justify-center font-black text-xs shadow-xs group-hover:scale-105 transition-transform">ZEN</div>
+                                <span>Zenya Kwaliteit</span>
+                            </a>
+
+                            <a href="#" onclick="alert('Opening Digitaal Leerplein UMC Utrecht...')" class="p-3 bg-slate-50 hover:bg-umc-pinklight/40 border border-slate-200 hover:border-umc-pinkaccent rounded-xl font-bold text-slate-800 hover:text-umc-pink transition-all flex flex-col items-center text-center gap-1.5 group">
+                                <div class="w-8 h-8 rounded-lg bg-purple-600 text-white flex items-center justify-center font-black text-xs shadow-xs group-hover:scale-105 transition-transform">DLP</div>
+                                <span>Digitaal Leerplein</span>
+                            </a>
+
+                            <a href="#" onclick="switchTab('hr')" class="p-3 bg-slate-50 hover:bg-umc-pinklight/40 border border-slate-200 hover:border-umc-pinkaccent rounded-xl font-bold text-slate-800 hover:text-umc-pink transition-all flex flex-col items-center text-center gap-1.5 group">
+                                <div class="w-8 h-8 rounded-lg bg-umc-pink text-white flex items-center justify-center font-black text-xs shadow-xs group-hover:scale-105 transition-transform">HR</div>
+                                <span>MijnHR / Salaris</span>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Personal Shift Roster & Room Booking Widget -->
+                    <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs space-y-4">
+                        <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+                            <h3 class="font-extrabold text-xs text-slate-900 uppercase tracking-wider flex items-center gap-2">
+                                <i data-lucide="calendar" class="w-4 h-4 text-umc-pink"></i>
+                                Mijn Dienstrooster
+                            </h3>
+                            <span class="text-[10px] font-bold text-umc-pink bg-umc-pinklight px-2 py-0.5 rounded-full">Week 41</span>
+                        </div>
+
+                        <div class="space-y-2 text-xs">
+                            <div class="p-2.5 bg-slate-50 rounded-xl border border-slate-200 flex justify-between items-center">
+                                <div>
+                                    <div class="font-bold text-slate-900">Vandaag (Woensdag)</div>
+                                    <div class="text-[11px] text-slate-500">Dagdienst • 07:30 - 16:00</div>
+                                </div>
+                                <span class="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded">Afdeling D4</span>
+                            </div>
+
+                            <div class="p-2.5 bg-slate-50 rounded-xl border border-slate-200 flex justify-between items-center">
+                                <div>
+                                    <div class="font-bold text-slate-900">Morgen (Donderdag)</div>
+                                    <div class="text-[11px] text-slate-500">Avonddienst • 15:00 - 23:30</div>
+                                </div>
+                                <span class="bg-blue-100 text-blue-800 text-[10px] font-bold px-2 py-0.5 rounded">Verpleegeenheid</span>
+                            </div>
+                        </div>
+
+                        <!-- Quick Room Booking CTA -->
+                        <button onclick="openRoomBookingModal()" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs py-2 rounded-xl flex items-center justify-center gap-2 transition-all">
+                            <i data-lucide="door-open" class="w-4 h-4 text-umc-pinkaccent"></i>
+                            <span>Reserveer Spreekkamer / Vergaderruimte</span>
+                        </button>
+                    </div>
+
+                    <!-- UMC! UIT Highlight Widget -->
+                    <div class="umc-gradient rounded-2xl p-5 text-white shadow-md space-y-3 relative overflow-hidden">
+                        <div class="relative z-10 space-y-2">
+                            <span class="bg-white/20 text-white font-extrabold text-[10px] px-2.5 py-0.5 rounded-full uppercase tracking-wider border border-white/20">Personeelsvoordeel</span>
+                            <h3 class="font-black text-base leading-tight">UMC! UIT: Korting op Sport & Vrije Tijd</h3>
+                            <p class="text-pink-100 text-xs">Geniet van 25% korting op fitness, museumjaarkaarten en voorstellingen in Utrecht.</p>
+                            <button onclick="switchTab('uit')" class="mt-2 bg-white text-umc-pink font-extrabold text-xs px-4 py-2 rounded-xl shadow-xs hover:bg-pink-50 transition-all flex items-center gap-2">
+                                <span>Bekijk Alle Voordelen</span>
+                                <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+
+        <!-- VIEW 2: GIDS & TELEFOONGIDS -->
+        <div id="view-directory" class="space-y-6 hidden">
+            <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs space-y-5">
+                <div class="border-b border-slate-100 pb-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div>
+                        <h2 class="text-lg font-black text-slate-900 flex items-center gap-2">
+                            <i data-lucide="book-user" class="w-5 h-5 text-umc-pink"></i>
+                            Telefoongids & Afdelingenzoeker
+                        </h2>
+                        <p class="text-xs text-slate-500">Vind collega's, verpleegafdelingen, piepers en interne toestelnummers</p>
+                    </div>
+
+                    <!-- Directory Filters -->
+                    <div class="flex items-center gap-2">
+                        <input type="text" id="directorySearchInput" oninput="filterDirectory()" placeholder="Zoek op naam, functie, afdeling of pieper..." class="bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs w-64 focus:outline-none focus:ring-2 focus:ring-umc-pink">
+                        <select id="directoryDeptFilter" onchange="filterDirectory()" class="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold text-slate-700">
+                            <option value="ALL">Alle Afdelingen</option>
+                            <option value="Interne Geneeskunde">Interne Geneeskunde</option>
+                            <option value="Cardiologie">Cardiologie</option>
+                            <option value="SEH (Spoedeisende Hulp)">SEH (Spoedeisende Hulp)</option>
+                            <option value="Kindergeneeskunde (WKZ)">Kindergeneeskunde (WKZ)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Directory Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="directoryGrid">
+                    <!-- Populated via JS -->
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW 3: PROTOCOLLEN & KWALITEIT -->
+        <div id="view-protocols" class="space-y-6 hidden">
+            <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs space-y-5">
+                <div class="border-b border-slate-100 pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div>
+                        <h2 class="text-lg font-black text-slate-900 flex items-center gap-2">
+                            <i data-lucide="file-check" class="w-5 h-5 text-umc-pink"></i>
+                            Protocollen & Verpleegkundige Procedures (Zenya Sync)
+                        </h2>
+                        <p class="text-xs text-slate-500">Officieel goedgekeurde richtlijnen van UMC Utrecht Kwaliteitscommissie</p>
+                    </div>
+
+                    <!-- Tag Filter Pills -->
+                    <div class="flex flex-wrap items-center gap-1.5 text-xs">
+                        <button onclick="filterProtocols('ALL')" class="protocol-tag-btn px-3 py-1 bg-umc-pink text-white rounded-lg font-bold">Alles</button>
+                        <button onclick="filterProtocols('Hygiëne')" class="protocol-tag-btn px-3 py-1 bg-slate-100 text-slate-700 rounded-lg font-semibold hover:bg-slate-200">Hygiëne & Infectie</button>
+                        <button onclick="filterProtocols('SEH')" class="protocol-tag-btn px-3 py-1 bg-slate-100 text-slate-700 rounded-lg font-semibold hover:bg-slate-200">Spoed & SEH</button>
+                        <button onclick="filterProtocols('Medicatie')" class="protocol-tag-btn px-3 py-1 bg-slate-100 text-slate-700 rounded-lg font-semibold hover:bg-slate-200">Medicatie-veiligheid</button>
+                    </div>
+                </div>
+
+                <!-- Protocol Table -->
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs border-collapse">
+                        <thead>
+                            <tr class="bg-slate-50 border-b border-slate-200 text-slate-600 font-bold uppercase text-[10px] tracking-wider">
+                                <th class="p-3">Protocol Code</th>
+                                <th class="p-3">Titel & Omschrijving</th>
+                                <th class="p-3">Categorie</th>
+                                <th class="p-3">Laatst Herzien</th>
+                                <th class="p-3">Eigenaar</th>
+                                <th class="p-3 text-right">Actie</th>
+                            </tr>
+                        </thead>
+                        <tbody id="protocolTableBody" class="divide-y divide-slate-100 font-medium">
+                            <!-- Populated via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW 4: UMC! UIT VOORDELEN HUB -->
+        <div id="view-uit" class="space-y-6 hidden">
+            <!-- Hero Banner -->
+            <div class="umc-gradient rounded-3xl p-6 sm:p-8 text-white shadow-lg flex flex-col md:flex-row items-center justify-between gap-6 relative overflow-hidden">
+                <div class="space-y-3 max-w-2xl relative z-10">
+                    <span class="bg-white/20 text-white font-extrabold text-xs px-3 py-1 rounded-full uppercase tracking-wider border border-white/30">Exclusief voor UMC Utrecht Personeel</span>
+                    <h2 class="text-2xl sm:text-3xl font-black">UMC! UIT: Jouw Voordelen & Vitaliteitshub</h2>
+                    <p class="text-pink-100 text-xs sm:text-sm leading-relaxed">
+                        Als medewerker van het UMC Utrecht verdien je het beste buiten de werkvloer. Profiteer van sportabonnementen, culturele uitjes in Utrecht, mentale coaching en exclusieve kortingen.
+                    </p>
+                </div>
+                <div class="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-4 text-center shrink-0 w-full md:w-56 space-y-1">
+                    <div class="text-3xl font-black text-white">2.450+</div>
+                    <div class="text-xs text-pink-100 font-medium">Medewerkers gebruikten UMC! UIT deze maand</div>
+                </div>
+            </div>
+
+            <!-- Benefits Cards Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="benefitsGrid">
+                <!-- Populated via JS -->
+            </div>
+        </div>
+
+        <!-- VIEW 5: MIJN HR & SALARIS -->
+        <div id="view-hr" class="space-y-6 hidden">
+            <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs space-y-6">
+                <div class="border-b border-slate-100 pb-4 flex items-center justify-between">
+                    <div>
+                        <h2 class="text-lg font-black text-slate-900 flex items-center gap-2">
+                            <i data-lucide="credit-card" class="w-5 h-5 text-umc-pink"></i>
+                            Mijn HR, Verlof & Salaris
+                        </h2>
+                        <p class="text-xs text-slate-500">Beheer je salarisstroken, verlofuren en reiskostenvergoeding (CAO UMC)</p>
+                    </div>
+                    <span class="bg-emerald-100 text-emerald-800 text-xs font-bold px-3 py-1 rounded-full border border-emerald-200">
+                        CAO UMC 2024-2026 Actief
+                    </span>
+                </div>
+
+                <!-- HR Overview Tiles -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div class="p-4 bg-slate-50 border border-slate-200 rounded-2xl space-y-2">
+                        <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Verlofsaldo 2026</span>
+                        <div class="text-2xl font-black text-slate-900">148.5 <span class="text-xs font-normal text-slate-500">uur</span></div>
+                        <div class="text-[11px] text-emerald-600 font-semibold">16 uur wettelijk restant</div>
+                    </div>
+
+                    <div class="p-4 bg-slate-50 border border-slate-200 rounded-2xl space-y-2">
+                        <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Laatste Salarisstrook</span>
+                        <div class="text-2xl font-black text-slate-900">September 2026</div>
+                        <button onclick="alert('Downloaden PDF Salarisstrook September 2026...')" class="text-[11px] font-bold text-umc-pink hover:underline flex items-center gap-1">
+                            <i data-lucide="download" class="w-3.5 h-3.5"></i> Download PDF
+                        </button>
+                    </div>
+
+                    <div class="p-4 bg-slate-50 border border-slate-200 rounded-2xl space-y-2">
+                        <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Reiskostenvergoeding</span>
+                        <div class="text-2xl font-black text-slate-900">NS Business Card</div>
+                        <div class="text-[11px] text-slate-600 font-medium">100% vergoeding OV traject Utrecht Centraal</div>
+                    </div>
+                </div>
+
+                <!-- Quick Action Buttons -->
+                <div class="pt-4 border-t border-slate-100 flex flex-wrap gap-3">
+                    <button onclick="alert('Formulier Aanvraag Verlof geopend.')" class="px-4 py-2.5 bg-umc-pink hover:bg-umc-pinkhover text-white font-bold text-xs rounded-xl transition-all shadow-xs flex items-center gap-2">
+                        <i data-lucide="calendar-plus" class="w-4 h-4"></i>
+                        <span>Verlof Aanvragen</span>
+                    </button>
+                    <button onclick="alert('Declaratiemodule geopend.')" class="px-4 py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-xl transition-all shadow-xs flex items-center gap-2">
+                        <i data-lucide="receipt" class="w-4 h-4"></i>
+                        <span>Onkosten Declareren</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- MODAL 1: Claim Benefit Modal -->
+    <div id="claimModal" class="hidden fixed inset-0 bg-slate-950/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-md w-full p-6 space-y-4 shadow-2xl border border-slate-200 animate-in fade-in zoom-in duration-200">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                <div class="flex items-center gap-2">
+                    <i data-lucide="gift" class="w-5 h-5 text-umc-pink"></i>
+                    <h3 id="claimTitle" class="font-extrabold text-sm text-slate-900">Voordeel Claimen</h3>
+                </div>
+                <button onclick="closeClaimModal()" class="text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+
+            <p id="claimDescription" class="text-xs text-slate-600 leading-relaxed">
+                Je staat op het punt om je persoonlijke kortingsvoucher te genereren voor UMC! UIT.
+            </p>
+
+            <div class="p-3 bg-umc-pinklight/50 border border-umc-pinklight rounded-xl space-y-1 text-xs">
+                <span class="font-bold text-umc-pink block">Jouw Medewerkerscode:</span>
+                <code class="font-mono text-slate-800 font-bold text-sm bg-white px-2 py-1 rounded border border-pink-200 block text-center select-all">UMC-UTRECHT-2026-X89</code>
+            </div>
+
+            <button onclick="confirmClaim()" class="w-full py-2.5 bg-umc-pink hover:bg-umc-pinkhover text-white font-bold text-xs rounded-xl transition-all shadow-md">
+                Bevestig en Stuur Naar Werk-E-mail
+            </button>
+        </div>
+    </div>
+
+    <!-- MODAL 2: Room Booking Modal -->
+    <div id="roomModal" class="hidden fixed inset-0 bg-slate-950/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-lg w-full p-6 space-y-4 shadow-2xl border border-slate-200">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                <h3 class="font-extrabold text-sm text-slate-900 flex items-center gap-2">
+                    <i data-lucide="door-open" class="w-5 h-5 text-umc-pink"></i>
+                    Reservering Spreekkamer / Overlegruimte
+                </h3>
+                <button onclick="closeRoomBookingModal()" class="text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+
+            <div class="space-y-3 text-xs">
+                <div>
+                    <label class="block font-semibold text-slate-700 mb-1">Locatie / Gebouw</label>
+                    <select class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 font-medium">
+                        <option>Hoofdgebouw (C-vleugel)</option>
+                        <option>Wilhelmina Kinderziekenhuis (WKZ)</option>
+                        <option>Stratenum Gebouw (Onderwijs)</option>
+                    </select>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Datum</label>
+                        <input type="date" value="2026-10-07" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2 font-medium">
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Tijdslot</label>
+                        <select class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2 font-medium">
+                            <option>10:00 - 11:00</option>
+                            <option>11:30 - 12:30</option>
+                            <option>14:00 - 15:00</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pt-2 flex justify-end gap-2">
+                <button onclick="closeRoomBookingModal()" class="px-4 py-2 bg-slate-100 text-slate-700 font-bold text-xs rounded-xl">Annuleren</button>
+                <button onclick="alert('Ruimte gereserveerd! Bevestiging verzonden naar Outlook.'); closeRoomBookingModal();" class="px-4 py-2 bg-umc-pink text-white font-bold text-xs rounded-xl shadow-xs">Reserveer Nu</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        /* Mock Datasets for Connect Intranet */
+        const directoryData = [
+            { name: "Dr. Anouk de Jong", role: "Verpleegkundig Specialist", dept: "Interne Geneeskunde", phone: "Toestel 4812", pieper: "Pieper 5501", email: "a.dejong-8@umcutrecht.nl", room: "B.02.314" },
+            { name: "Prof. dr. Marc Willems", role: "Hoofd Cardioloog", dept: "Cardiologie", phone: "Toestel 1920", pieper: "Pieper 1102", email: "m.willems@umcutrecht.nl", room: "E.04.102" },
+            { name: "Sanne Bakker, RN", role: "SEH Verpleegkundige", dept: "SEH (Spoedeisende Hulp)", phone: "Toestel 9911", pieper: "Pieper 9000 (Spoed)", email: "s.bakker-3@umcutrecht.nl", room: "Balie SEH" },
+            { name: "Drs. Lieke van Dam", role: "Kinderarts-Infectioloog", dept: "Kindergeneeskunde (WKZ)", phone: "Toestel 3044", pieper: "Pieper 4109", email: "l.vandam@wkz.nl", room: "WKZ 1.12" },
+            { name: "Peter de Vries", role: "Systeembeheerder HiX", dept: "ICT & Digitalisering", phone: "Toestel 7777", pieper: "N.v.t.", email: "p.devries@umcutrecht.nl", room: "Stratenum 3.08" }
+        ];
+
+        const protocolData = [
+            { code: "PROT-HYG-004", title: "Handhygiëne & Desinfectie Richtlijnen 2026", cat: "Hygiëne", date: "01-10-2026", owner: "Infectiepreventie" },
+            { code: "PROT-SEH-112", title: "Triage & Opvang Acuut Coronair Syndroom (ACS)", cat: "SEH", date: "15-09-2026", owner: "Cardiologie Board" },
+            { code: "PROT-MED-301", title: "Dubbelcheck High-Risk Medicatie (Cytostatica/Insuline)", cat: "Medicatie", date: "20-08-2026", owner: "Apotheek UMC" },
+            { code: "PROT-EPD-009", title: "Werkinstructie HiX Noodprocedure bij Systeemuitval", cat: "SEH", date: "04-10-2026", owner: "ICT Zorg" }
+        ];
+
+        const benefitsData = [
+            { title: "Sport & Fitness Netwerk Utrecht", desc: "Tot 40% korting bij 15+ sportscholen in Utrecht (incl. Parnassos & Sportcentrum Olympos).", tag: "Sport & Vitaliteit" },
+            { title: "TivoliVredenburg Concertkaarten", desc: "Exclusieve personeelskorting van €10,- per ticket voor geselecteerde klassieke & popconcerten.", tag: "Cultuur & Uitjes" },
+            { title: "Bedrijfsfietsregeling / Leasefiets", desc: "Schaf voordelig een e-bike aan via je bruto salaris of eindejaarsuitkering.", tag: "Duurzaam Reizen" },
+            { title: "Mental Health & Veerkracht Coaching", desc: "Gratis en anonieme coaching door het UMC Utrecht Bedrijfsmaatschappelijk Werk.", tag: "Gezondheid" }
+        ];
+
+        /* Tab Switch Functionality */
+        function switchTab(tabKey) {
+            ['home', 'directory', 'protocols', 'uit', 'hr'].forEach(t => {
+                document.getElementById(`view-${t}`).classList.add('hidden');
+                const btn = document.getElementById(`tab-${t}`);
+                if (btn) {
+                    btn.classList.remove('tab-active');
+                    btn.classList.add('text-slate-300');
+                }
+            });
+
+            document.getElementById(`view-${tabKey}`).classList.remove('hidden');
+            const activeBtn = document.getElementById(`tab-${tabKey}`);
+            if (activeBtn) {
+                activeBtn.classList.add('tab-active');
+                activeBtn.classList.remove('text-slate-300');
+            }
+        }
+
+        /* Render Telefoongids Cards */
+        function renderDirectory(items) {
+            const grid = document.getElementById("directoryGrid");
+            grid.innerHTML = items.map(person => `
+                <div class="p-4 bg-slate-50 border border-slate-200 rounded-2xl space-y-3 card-hover">
+                    <div class="flex items-start justify-between">
+                        <div>
+                            <h4 class="font-extrabold text-slate-900 text-sm">${person.name}</h4>
+                            <p class="text-xs text-umc-pink font-semibold">${person.role}</p>
+                            <p class="text-[11px] text-slate-500 font-medium">${person.dept}</p>
+                        </div>
+                        <span class="p-2 bg-white rounded-xl border border-slate-200 text-slate-400">
+                            <i data-lucide="phone" class="w-4 h-4 text-umc-pink"></i>
+                        </span>
+                    </div>
+
+                    <div class="pt-2 border-t border-slate-200 grid grid-cols-2 gap-2 text-[11px] font-mono text-slate-700">
+                        <div class="bg-white p-1.5 rounded-lg border border-slate-200">
+                            <span class="text-[9px] text-slate-400 block font-sans uppercase font-bold">Telefoon</span>
+                            ${person.phone}
+                        </div>
+                        <div class="bg-white p-1.5 rounded-lg border border-slate-200">
+                            <span class="text-[9px] text-slate-400 block font-sans uppercase font-bold">Pieper</span>
+                            ${person.pieper}
+                        </div>
+                    </div>
+
+                    <div class="text-[11px] text-slate-500 flex items-center justify-between pt-1">
+                        <span>Kamernr: <strong class="text-slate-800">${person.room}</strong></span>
+                        <a href="mailto:${person.email}" class="text-umc-pink font-bold hover:underline">E-mail →</a>
+                    </div>
+                </div>
+            `).join('');
+
+            lucide.createIcons();
+        }
+
+        function filterDirectory() {
+            const query = document.getElementById("directorySearchInput").value.toLowerCase();
+            const dept = document.getElementById("directoryDeptFilter").value;
+
+            const filtered = directoryData.filter(d => {
+                const matchesQuery = d.name.toLowerCase().includes(query) || d.role.toLowerCase().includes(query) || d.pieper.toLowerCase().includes(query);
+                const matchesDept = (dept === 'ALL' || d.dept === dept);
+                return matchesQuery && matchesDept;
+            });
+
+            renderDirectory(filtered);
+        }
+
+        /* Render Protocols Table */
+        function renderProtocols(items) {
+            const tbody = document.getElementById("protocolTableBody");
+            tbody.innerHTML = items.map(p => `
+                <tr class="hover:bg-slate-50 transition-all">
+                    <td class="p-3 font-mono font-bold text-umc-pink">${p.code}</td>
+                    <td class="p-3">
+                        <div class="font-bold text-slate-900">${p.title}</div>
+                        <div class="text-[10px] text-slate-500">Geverifieerd voor klinische ziekenhuispraktijk</div>
+                    </td>
+                    <td class="p-3"><span class="bg-slate-100 text-slate-700 text-[10px] font-bold px-2 py-0.5 rounded">${p.cat}</span></td>
+                    <td class="p-3 text-slate-500 font-mono">${p.date}</td>
+                    <td class="p-3 text-slate-700 font-medium">${p.owner}</td>
+                    <td class="p-3 text-right">
+                        <button onclick="alert('Openen Zenya document: ${p.code}')" class="px-2.5 py-1 bg-umc-pinklight hover:bg-pink-200 text-umc-pink font-bold rounded-lg transition-all text-[11px]">
+                            Zenya Openen
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function filterProtocols(category) {
+            const filtered = (category === 'ALL') ? protocolData : protocolData.filter(p => p.cat === category);
+            renderProtocols(filtered);
+        }
+
+        /* Render UMC! UIT Benefits Grid */
+        function renderBenefits() {
+            const grid = document.getElementById("benefitsGrid");
+            grid.innerHTML = benefitsData.map(b => `
+                <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs space-y-3 flex flex-col justify-between card-hover">
+                    <div class="space-y-2">
+                        <span class="bg-umc-pinklight text-umc-pink font-extrabold text-[10px] px-2.5 py-0.5 rounded-full uppercase">${b.tag}</span>
+                        <h3 class="font-extrabold text-slate-900 text-sm leading-snug">${b.title}</h3>
+                        <p class="text-slate-600 text-xs leading-relaxed">${b.desc}</p>
+                    </div>
+
+                    <button onclick="openClaimModal('${b.title}', '${b.desc}')" class="w-full py-2 bg-slate-900 hover:bg-umc-pink text-white font-bold text-xs rounded-xl transition-all shadow-xs flex items-center justify-center gap-2">
+                        <i data-lucide="ticket" class="w-4 h-4"></i>
+                        <span>Claim Voordeel / Voucher</span>
+                    </button>
+                </div>
+            `).join('');
+
+            lucide.createIcons();
+        }
+
+        /* Global Search Auto-complete */
+        function handleGlobalSearch(query) {
+            const dropdown = document.getElementById("searchResultsDropdown");
+            if (!query || query.length < 2) {
+                dropdown.classList.add("hidden");
+                return;
+            }
+
+            const q = query.toLowerCase();
+            const matchingPeople = directoryData.filter(d => d.name.toLowerCase().includes(q) || d.dept.toLowerCase().includes(q));
+            const matchingProtocols = protocolData.filter(p => p.title.toLowerCase().includes(q) || p.code.toLowerCase().includes(q));
+
+            let html = '';
+
+            if (matchingPeople.length > 0) {
+                html += `<div class="p-2 bg-slate-100 font-bold text-[10px] uppercase text-slate-500">Telefoongids / Medewerkers</div>`;
+                matchingPeople.forEach(p => {
+                    html += `<div onclick="switchTab('directory');" class="p-2.5 hover:bg-umc-pinklight/30 cursor-pointer flex justify-between">
+                        <span class="font-bold text-slate-800">${p.name} (${p.dept})</span>
+                        <span class="font-mono text-umc-pink font-bold">${p.phone}</span>
+                    </div>`;
+                });
+            }
+
+            if (matchingProtocols.length > 0) {
+                html += `<div class="p-2 bg-slate-100 font-bold text-[10px] uppercase text-slate-500">Zenya Protocollen</div>`;
+                matchingProtocols.forEach(p => {
+                    html += `<div onclick="switchTab('protocols');" class="p-2.5 hover:bg-umc-pinklight/30 cursor-pointer flex justify-between">
+                        <span class="font-bold text-slate-800">${p.title}</span>
+                        <span class="font-mono text-slate-500">${p.code}</span>
+                    </div>`;
+                });
+            }
+
+            if (!html) {
+                html = `<div class="p-4 text-center text-slate-400">Geen zoekresultaten gevonden for "${query}"</div>`;
+            }
+
+            dropdown.innerHTML = html;
+            dropdown.classList.remove("hidden");
+        }
+
+        /* Modals & Popups Control */
+        function toggleNotifications() {
+            document.getElementById("notificationsDrawer").classList.toggle("hidden");
+        }
+
+        function openClaimModal(title, desc) {
+            document.getElementById("claimTitle").textContent = title;
+            document.getElementById("claimDescription").textContent = desc;
+            document.getElementById("claimModal").classList.remove("hidden");
+        }
+
+        function closeClaimModal() {
+            document.getElementById("claimModal").classList.add("hidden");
+        }
+
+        function confirmClaim() {
+            alert("Gefeliciteerd! De voucher is succesvol verstuurd naar a.dejong-8@umcutrecht.nl.");
+            closeClaimModal();
+        }
+
+        function openRoomBookingModal() {
+            document.getElementById("roomModal").classList.remove("hidden");
+        }
+
+        function closeRoomBookingModal() {
+            document.getElementById("roomModal").classList.add("hidden");
+        }
+
+        function openArticleModal(id) {
+            alert(`Opening artikel #${id} uit UMC Utrecht Nieuwsarchief...`);
+        }
+
+        /* On Initial Window Load */
+        window.onload = function() {
+            lucide.createIcons();
+            renderDirectory(directoryData);
+            renderProtocols(protocolData);
+            renderBenefits();
+
+            // Close search dropdown on click outside
+            document.addEventListener('click', function(e) {
+                if (!e.target.closest('#globalSearchInput')) {
+                    document.getElementById("searchResultsDropdown").classList.add("hidden");
+                }
+            });
+        };
+    </script>
+</body>
+</html>
